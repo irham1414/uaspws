@@ -1,44 +1,38 @@
-<?php 
+<?php
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory; // Tambahkan ini
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-// Pastikan model terkait (Province dan District) juga diimpor di file ini
-use App\Models\Province;
-use App\Models\District;
 
 class City extends Model
 {
-    // Tambahkan Trait ini jika Anda menggunakan factory
-    use HasFactory; 
+    use HasFactory;
+
+    // Jika nama tabel bukan default "cities"
+    protected $table = 'city';
+
+    // Jika primary key bukan "id"
+    protected $primaryKey = 'city_id';
+
+    protected $fillable = [
+        'province_id',
+        'city_name'
+    ];
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = ['province_id', 'name'];
-
-    
-    // Optional: Jika nama kolom primary key Anda bukan 'id'
-    // protected $primaryKey = 'id'; 
-
-    /**
-     * Get the province that owns the city.
+     * Relasi: City milik satu Province
      */
     public function province()
     {
-        // Pastikan Model Province diimpor di bagian atas
-        return $this->belongsTo(Province::class, 'province_id'); 
+        return $this->belongsTo(Province::class, 'province_id', 'province_id');
     }
 
     /**
-     * Get the districts for the city.
+     * Relasi: City memiliki banyak District
      */
     public function districts()
     {
-        // Pastikan Model District diimpor di bagian atas
-        return $this->hasMany(District::class, 'city_id'); 
+        return $this->hasMany(District::class, 'city_id', 'city_id');
     }
 }
