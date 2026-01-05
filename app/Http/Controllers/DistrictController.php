@@ -2,47 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\District;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class DistrictController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return District::all();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $district = District::create($request->validate([
+            'city_id' => 'required',
+            'code' => 'required|unique:districts',
+            'name' => 'required'
+        ]));
+
+        Log::info('Tambah kecamatan', ['user_id' => auth()->id()]);
+        return response()->json($district, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function update(Request $request, District $district)
     {
-        //
+        $district->update($request->all());
+        Log::info('Update kecamatan', ['user_id' => auth()->id()]);
+        return $district;
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(District $district)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $district->delete();
+        Log::info('Hapus kecamatan', ['user_id' => auth()->id()]);
+        return response()->json(['message' => 'Kecamatan dihapus']);
     }
 }

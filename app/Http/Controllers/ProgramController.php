@@ -2,47 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Program;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ProgramController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return Program::all();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $program = Program::create($request->validate([
+            'title' => 'required',
+            'description' => 'required',
+            'year' => 'required|digits:4'
+        ]));
+
+        Log::info('Tambah program', ['user_id' => auth()->id()]);
+        return response()->json($program, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function update(Request $request, Program $program)
     {
-        //
+        $program->update($request->all());
+        Log::info('Update program', ['user_id' => auth()->id()]);
+        return $program;
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy(Program $program)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $program->delete();
+        Log::info('Hapus program', ['user_id' => auth()->id()]);
+        return response()->json(['message' => 'Program dihapus']);
     }
 }
