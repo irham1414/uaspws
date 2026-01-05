@@ -6,5 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Province extends Model
 {
-    //
+    protected $fillable = ['code', 'name'];
+
+    public function cities()
+    {
+        return $this->hasMany(City::class);
+    }
 }
