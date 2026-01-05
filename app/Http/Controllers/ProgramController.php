@@ -8,34 +8,26 @@ use Illuminate\Support\Facades\Log;
 
 class ProgramController extends Controller
 {
-    public function index()
-    {
+    public function index() {
         return Program::all();
     }
 
-    public function store(Request $request)
-    {
-        $program = Program::create($request->validate([
-            'title' => 'required',
-            'description' => 'required',
-            'year' => 'required|digits:4'
-        ]));
-
-        Log::info('Tambah program', ['user_id' => auth()->id()]);
-        return response()->json($program, 201);
+    public function store(Request $request) {
+        return Program::create($request->all());
     }
 
-    public function update(Request $request, Program $program)
-    {
+    public function show($id) {
+        return Program::findOrFail($id);
+    }
+
+    public function update(Request $request, $id) {
+        $program = Program::findOrFail($id);
         $program->update($request->all());
-        Log::info('Update program', ['user_id' => auth()->id()]);
         return $program;
     }
 
-    public function destroy(Program $program)
-    {
-        $program->delete();
-        Log::info('Hapus program', ['user_id' => auth()->id()]);
-        return response()->json(['message' => 'Program dihapus']);
+    public function destroy($id) {
+        Program::destroy($id);
+        return response()->json(['message'=>'Deleted']);
     }
 }

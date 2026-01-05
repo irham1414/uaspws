@@ -7,14 +7,45 @@ use App\Http\Controllers\CityController;
 use App\Http\Controllers\DistrictController;
 use App\Http\Controllers\ProgramController;
 
+/*
+|--------------------------------------------------------------------------
+| AUTH ROUTES (PUBLIC)
+|--------------------------------------------------------------------------
+| Rute untuk Login dan Register harus bersifat publik.
+*/
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::middleware('auth:api')->group(function () {
+
+/*
+|--------------------------------------------------------------------------
+| PUBLIC ROUTES (DATA WILAYAH)
+|--------------------------------------------------------------------------
+| Rute untuk melihat/listing data wilayah (READ) tanpa perlu token.
+*/
+// Hanya mengizinkan method GET (index dan show) agar publik.
+Route::apiResource('provinces', ProvinceController::class)->only(['index', 'show']);
+Route::apiResource('cities', CityController::class)->only(['index', 'show']);
+Route::apiResource('districts', DistrictController::class)->only(['index', 'show']);
+
+
+/*
+|--------------------------------------------------------------------------
+| PROTECTED ROUTES (JWT)
+|--------------------------------------------------------------------------
+| Rute untuk operasi yang membutuhkan otorisasi (Create, Update, Delete).
+*/
+Route::middleware(['auth:api'])->group(function () {
+
+    // Rute Logout harus terproteksi
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::apiResource('provinces', ProvinceController::class);
-    Route::apiResource('cities', CityController::class);
-    Route::apiResource('districts', DistrictController::class);
+    // Operasi Create, Update, Delete (Store, Update, Destroy) untuk data wilayah.
+    Route::apiResource('provinces', ProvinceController::class)->except(['index', 'show']);
+    Route::apiResource('cities', CityController::class)->except(['index', 'show']);
+    Route::apiResource('districts', DistrictController::class)->except(['index', 'show']);
+
+    // Semua operasi CRUD pada Programs terproteksi.
     Route::apiResource('programs', ProgramController::class);
+
 });

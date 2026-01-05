@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Models\User;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
         $request->validate([
-            'name'     => 'required|string|max:100',
+            'name'     => 'required|string',
             'email'    => 'required|email|unique:users',
             'password' => 'required|min:6'
         ]);
@@ -24,33 +23,36 @@ class AuthController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
-        Log::info('Register user', ['user_id' => $user->id]);
-
-        return response()->json(['message' => 'Register berhasil'], 201);
+        return response()->json([
+            'message' => 'Register berhasil',
+            'user'    => $user
+        ], 201);
     }
 
     public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password');
+{
+    $credentials = $request->only('email', 'password');
 
-        if (! $token = Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Login gagal'], 401);
-        }
-
-        Log::info('Login user', ['user_id' => Auth::id()]);
-
+    if (!$token = auth('api')->attempt($credentials)) {
         return response()->json([
-            'token' => $token,
-            'type'  => 'Bearer'
-        ]);
+            'error' => 'Email atau password salah'
+        ], 401);
     }
+
+    return response()->json([
+        'token' => $token,
+        'type'  => 'bearer'
+    ]);
+}
+
 
     public function logout()
-    {
-        Auth::logout();
+{
+    auth('api')->logout();
 
-        Log::info('Logout user', ['user_id' => auth()->id()]);
+    return response()->json([
+        'message' => 'Logout berhasil'
+    ]);
+}
 
-        return response()->json(['message' => 'Logout berhasil']);
-    }
 }

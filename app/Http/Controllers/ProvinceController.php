@@ -9,23 +9,25 @@ use Illuminate\Support\Facades\Log;
 class ProvinceController extends Controller
 {
     public function index()
-    {
-        return Province::all();
-    }
+{
+    $data = Province::all();
+
+    return response()->json([
+        'success' => true,
+        'data' => $data
+    ]);
+}
 
     public function store(Request $request)
-    {
-        $data = $request->validate([
-            'code' => 'required|unique:provinces',
-            'name' => 'required'
-        ]);
-
-        $province = Province::create($data);
-
-        Log::info('Tambah provinsi', ['user_id' => auth()->id()]);
-
-        return response()->json($province, 201);
-    }
+{
+    // Hapus aturan unique:cities yang memicu error
+    $validatedData = $request->validate([
+        'province_id' => 'required|exists:provinces,id', 
+        'code' => 'required|string|max:10', // <--- HANYA MENGGUNAKAN REQUIRED
+        'name' => 'required|string|max:255'
+    ]);
+    
+   }   // ... sisanya
 
     public function update(Request $request, Province $province)
     {
