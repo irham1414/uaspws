@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Contracts\Auth\Guard; // <- penting untuk type hint
 use App\Models\User;
 use App\Helpers\ApiFormatter;
 
@@ -26,7 +27,6 @@ class AuthController extends Controller
             'password' => Hash::make($validated['password']),
         ]);
 
-        // Filter password
         $userData = ApiFormatter::filterSensitiveData($user->toArray());
 
         return ApiFormatter::createJson(201, "Registrasi berhasil", $userData);
@@ -39,7 +39,10 @@ class AuthController extends Controller
     {
         $credentials = $request->only('email', 'password');
 
-        if (!$token = auth('api')->attempt($credentials)) {
+        /** @var \Tymon\JWTAuth\JWTGuard $auth */
+        $auth = auth('api');
+
+        if (!$token = $auth->attempt($credentials)) {
             return ApiFormatter::createJson(401, "Email atau password salah");
         }
 
@@ -54,7 +57,9 @@ class AuthController extends Controller
      */
     public function logout()
     {
-        auth('api')->logout();
+        /** @var \Tymon\JWTAuth\JWTGuard $auth */
+        $auth = auth('api');
+        $auth->logout();
 
         return ApiFormatter::createJson(200, "Logout berhasil");
     }
