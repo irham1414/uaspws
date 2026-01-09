@@ -9,16 +9,16 @@ class District extends Model
 {
     use HasFactory;
 
-    // Jika nama tabel bukan default "districts"
-    protected $table = 'district';
-
-    // Jika primary key bukan "id"
-    protected $primaryKey = 'district_id';
+    /**
+     * PERBAIKAN:
+     * 1. Hapus $table = 'district' (Karena tabel aslinya 'districts')
+     * 2. Hapus $primaryKey = 'district_id' (Karena PK aslinya 'id')
+     */
 
     protected $fillable = [
-        'city_id',
-        'district_code',
-        'district_name'
+        'city_id', // Foreign Key ke tabel cities
+        'name'     // Nama Kecamatan (Sesuaikan dengan gambar database)
+        // HAPUS 'district_code' karena kolomnya tidak ada di database
     ];
 
     /**
@@ -26,6 +26,7 @@ class District extends Model
      */
     public function city()
     {
-        return $this->belongsTo(City::class, 'city_id', 'city_id');
+        // Parameter tambahan dihapus karena sudah standar Laravel
+        return $this->belongsTo(City::class);
     }
 }

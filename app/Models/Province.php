@@ -9,23 +9,37 @@ class Province extends Model
 {
     use HasFactory;
 
-    // Nama tabel jika bukan default "provinces"
-    protected $table = 'province';
+    /**
+     * PERBAIKAN 1: Tabel
+     * Karena nama tabel Anda 'provinces' (jamak), ini sudah standar Laravel.
+     * Baris ini boleh ada, boleh tidak.
+     */
+    protected $table = 'provinces';
 
-    // Primary key jika bukan "id"
-    protected $primaryKey = 'province_id';
+    /**
+     * PERBAIKAN 2: Primary Key (KRUSIAL!)
+     * Di gambar database, kolom kunci Anda adalah 'id'.
+     * JANGAN definisikan 'province_id' di sini, atau akan Error SQL.
+     * Kita hapus baris protected $primaryKey agar kembali ke default 'id'.
+     */
 
-    // Jika primary key bukan auto increment integer
-    // public $incrementing = true;
-    // protected $keyType = 'int';
-
+    /**
+     * PERBAIKAN 3: Fillable
+     * Sesuaikan dengan nama kolom di screenshot database Anda: 'code' dan 'name'.
+     * Jangan pakai 'province_code' atau 'province_name'.
+     */
     protected $fillable = [
-        'province_code',
-        'province_name'
+        'code',
+        'name'
     ];
 
+    /**
+     * Relasi ke City
+     */
     public function cities()
     {
-        return $this->hasMany(City::class, 'province_id', 'province_id');
+        // Parameter 2: Foreign Key di tabel cities (biasanya 'province_id')
+        // Parameter 3: Local Key di tabel ini (id) -> Tidak perlu ditulis karena sudah default
+        return $this->hasMany(City::class, 'province_id');
     }
 }

@@ -8,34 +8,126 @@ use Illuminate\Support\Facades\Log;
 
 class DistrictController extends Controller
 {
+    /**
+     * 1. READ ALL (Index)
+     * Menampilkan kecamatan beserta nama kotanya
+     */
     public function index()
     {
-        return District::all();
+        // with('city') digunakan agar data kota induknya ikut tampil
+        $districts = District::with('city')->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $districts
+        ], 200);
     }
 
+    /**
+     * 2. SHOW (Read One)
+     */
+    public function show($id)
+    {
+        $district = District::with('city')->find($id);
+
+        if (!$district) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data kecamatan tidak ditemukan'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $district
+        ], 200);
+    }
+
+    /**
+     * 3. CREATE (Store)
+     */
     public function store(Request $request)
     {
-        $district = District::create($request->validate([
-            'city_id' => 'required',
-            'code' => 'required|unique:districts',
-            'name' => 'required'
-        ]));
+        // PERBAIKAN: Menghapus 'code' karena tidak ada di database
+        $validatedData = $request->validate([
+            'city_id' => 'required|exists:cities,id', // Wajib ada di tabel cities
+            'name'    => 'required|string|max:255'
+        ]);
 
-        Log::info('Tambah kecamatan', ['user_id' => auth()->id()]);
-        return response()->json($district, 201);
+        try {
+            $district = District::create([
+                'city_id' => $validatedData['city_id'],
+                'name'    => $validatedData['name']
+            ]);
+
+            Log::info('Tambah kecamatan', [
+                'user_id' => auth()->id() ?? 'guest', 
+                'district_id' => $district->id
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Kecamatan berhasil ditambahkan',
+                'data' => $district
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal menyimpan data'], 500);
+        }
     }
 
-    public function update(Request $request, District $district)
+    /**
+     * 4. UPDATE
+     */
+    public function update(Request $request, $id)
     {
-        $district->update($request->all());
-        Log::info('Update kecamatan', ['user_id' => auth()->id()]);
-        return $district;
+        $district = District::find($id);
+
+        if (!$district) {
+            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+        }
+
+        // Validasi input
+        $validatedData = $request->validate([
+            'city_id' => 'sometimes|exists:cities,id',
+            'name'    => 'sometimes|string|max:255'
+        ]);
+
+        $district->update($validatedData);
+
+        Log::info('Update kecamatan', [
+            'user_id' => auth()->id() ?? 'guest', 
+            'district_id' => $district->id
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kecamatan berhasil diupdate',
+            'data' => $district
+        ]);
     }
 
-    public function destroy(District $district)
+    /**
+     * 5. DELETE (Destroy)
+     */
+    public function destroy($id)
     {
+        $district = District::find($id);
+
+        if (!$district) {
+            return response()->json(['success' => false, 'message' => 'Data tidak ditemukan'], 404);
+        }
+
         $district->delete();
-        Log::info('Hapus kecamatan', ['user_id' => auth()->id()]);
-        return response()->json(['message' => 'Kecamatan dihapus']);
+
+        Log::info('Hapus kecamatan', [
+            'user_id' => auth()->id() ?? 'guest', 
+            'district_id' => $id
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Kecamatan berhasil dihapus'
+        ]);
     }
 }
