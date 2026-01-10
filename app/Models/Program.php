@@ -9,20 +9,21 @@ class Program extends Model
 {
     use HasFactory;
 
-    // Jika nama tabel bukan default "programs"
-    protected $table = 'program';
+    /**
+     * PERBAIKAN:
+     * 1. Hapus $table = 'program' (Karena tabel aslinya 'programs')
+     * 2. Hapus $primaryKey = 'program_id' (Karena PK aslinya 'id')
+     */
 
-    // Jika primary key bukan "id"
-    protected $primaryKey = 'program_id';
-
+    /**
+     * PERBAIKAN FILLABLE:
+     * Sesuaikan dengan kolom di screenshot: 'name' dan 'description'.
+     * HAPUS 'title' dan 'year' karena tidak ada di database.
+     */
     protected $fillable = [
-        'title',
-        'description',
-        'year'
+        'name',
+        'description'
     ];
 
-    // Jika kolom year bertipe integer
-    protected $casts = [
-        'year' => 'integer'
-    ];
+    // Hapus $casts 'year' karena kolom tahun tidak ada.
 }
