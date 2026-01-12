@@ -10,15 +10,8 @@ class City extends Model
     use HasFactory;
 
     /**
-     * PERBAIKAN 1: Hapus properti $table dan $primaryKey.
-     * Karena di database nama tabelnya 'cities' (jamak) dan kuncinya 'id',
-     * Laravel sudah otomatis tahu. Tidak perlu ditulis manual.
-     */
-
-    /**
-     * PERBAIKAN 2: $fillable
+     * $fillable
      * Sesuaikan dengan nama kolom di screenshot database: 'province_id' dan 'name'.
-     * JANGAN gunakan 'city_name'.
      */
     protected $fillable = [
         'province_id',
@@ -30,7 +23,6 @@ class City extends Model
      */
     public function province()
     {
-        // Parameter tambahan dihapus karena nama foreign key sudah standar (province_id)
         return $this->belongsTo(Province::class);
     }
 
@@ -39,8 +31,24 @@ class City extends Model
      */
     public function districts()
     {
-        // Parameter tambahan dihapus karena asumsi tabel districts juga standar
         return $this->hasMany(District::class);
     }
+
+    /**
+     * BARU: Relasi ke data statistik penduduk
+     * (One-to-Many: Satu kota punya banyak riwayat data penduduk)
+     */
+    public function populationStats()
+    {
+        return $this->hasMany(PopulationStat::class);
+    }
+
+    /**
+     * BARU: Relasi ke program yang berjalan di kota ini
+     * (One-to-Many: Satu kota punya banyak program berjalan)
+     */
+    public function programImplementations()
+    {
+        return $this->hasMany(ProgramImplementation::class);
+    }
 }
-// izamadd

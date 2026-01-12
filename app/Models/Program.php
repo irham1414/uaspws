@@ -10,20 +10,21 @@ class Program extends Model
     use HasFactory;
 
     /**
-     * PERBAIKAN:
-     * 1. Hapus $table = 'program' (Karena tabel aslinya 'programs')
-     * 2. Hapus $primaryKey = 'program_id' (Karena PK aslinya 'id')
-     */
-
-    /**
-     * PERBAIKAN FILLABLE:
-     * Sesuaikan dengan kolom di screenshot: 'name' dan 'description'.
-     * HAPUS 'title' dan 'year' karena tidak ada di database.
+     * $fillable
+     * Sesuai dengan kolom di database: 'name' dan 'description'.
      */
     protected $fillable = [
         'name',
         'description'
     ];
 
-    // Hapus $casts 'year' karena kolom tahun tidak ada.
+    /**
+     * BARU: Relasi ke tabel implementasi program.
+     * (One-to-Many: Satu jenis program bisa dilaksanakan di banyak kota/wilayah).
+     * * Cara panggil: $program->implementations
+     */
+    public function implementations()
+    {
+        return $this->hasMany(ProgramImplementation::class);
+    }
 }

@@ -6,6 +6,9 @@ use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\DistrictController;
 use App\Http\Controllers\ProgramController;
+// TAMBAHAN: Import Controller Baru
+use App\Http\Controllers\PopulationStatController;
+use App\Http\Controllers\ProgramImplementationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,5 +50,18 @@ Route::middleware(['auth:api'])->group(function () {
 
     // Semua operasi CRUD pada Programs terproteksi.
     Route::apiResource('programs', ProgramController::class);
+
+    /*
+    |--------------------------------------------------------------------------
+    | TAMBAHAN: STATISTIK PENDUDUK & IMPLEMENTASI PROGRAM
+    |--------------------------------------------------------------------------
+    */
+    
+    // 1. Input Data Statistik Penduduk
+    Route::post('/population-stats', [PopulationStatController::class, 'store']);
+
+    // 2. Input & Update Implementasi Program di Wilayah
+    Route::post('/program-implementations', [ProgramImplementationController::class, 'store']);
+    Route::put('/program-implementations/{id}', [ProgramImplementationController::class, 'update']);
 
 });
