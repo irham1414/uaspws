@@ -6,9 +6,10 @@ use App\Http\Controllers\ProvinceController;
 use App\Http\Controllers\CityController;
 use App\Http\Controllers\DistrictController;
 use App\Http\Controllers\ProgramController;
-// TAMBAHAN: Import Controller Baru
+// Import Controller Baru
 use App\Http\Controllers\PopulationStatController;
 use App\Http\Controllers\ProgramImplementationController;
+use App\Http\Controllers\PublicFacilityController;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +27,6 @@ Route::post('/login', [AuthController::class, 'login']);
 |--------------------------------------------------------------------------
 | Rute untuk melihat/listing data wilayah (READ) tanpa perlu token.
 */
-// Hanya mengizinkan method GET (index dan show) agar publik.
 Route::apiResource('provinces', ProvinceController::class)->only(['index', 'show']);
 Route::apiResource('cities', CityController::class)->only(['index', 'show']);
 Route::apiResource('districts', DistrictController::class)->only(['index', 'show']);
@@ -40,28 +40,28 @@ Route::apiResource('districts', DistrictController::class)->only(['index', 'show
 */
 Route::middleware(['auth:api'])->group(function () {
 
-    // Rute Logout harus terproteksi
+    // 1. AUTH
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    // Operasi Create, Update, Delete (Store, Update, Destroy) untuk data wilayah.
+    // 2. DATA WILAYAH (Write Operations)
     Route::apiResource('provinces', ProvinceController::class)->except(['index', 'show']);
     Route::apiResource('cities', CityController::class)->except(['index', 'show']);
     Route::apiResource('districts', DistrictController::class)->except(['index', 'show']);
 
-    // Semua operasi CRUD pada Programs terproteksi.
+    // 3. PROGRAMS (All CRUD)
     Route::apiResource('programs', ProgramController::class);
 
-    /*
-    |--------------------------------------------------------------------------
-    | TAMBAHAN: STATISTIK PENDUDUK & IMPLEMENTASI PROGRAM
-    |--------------------------------------------------------------------------
-    */
-    
-    // 1. Input Data Statistik Penduduk
+    // 4. STATISTIK PENDUDUK
     Route::post('/population-stats', [PopulationStatController::class, 'store']);
 
-    // 2. Input & Update Implementasi Program di Wilayah
+    // 5. IMPLEMENTASI PROGRAM
     Route::post('/program-implementations', [ProgramImplementationController::class, 'store']);
     Route::put('/program-implementations/{id}', [ProgramImplementationController::class, 'update']);
+
+    // 6. FASILITAS PUBLIK (Baru Ditambahkan)
+    // Langsung ditaruh di sini, tidak perlu buat grup middleware baru lagi
+    Route::post('/public-facilities', [PublicFacilityController::class, 'store']); // Tambah
+    Route::put('/public-facilities/{id}', [PublicFacilityController::class, 'update']); // Edit
+    Route::delete('/public-facilities/{id}', [PublicFacilityController::class, 'destroy']); // Hapus
 
 });
