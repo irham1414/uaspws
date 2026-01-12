@@ -43,3 +43,4 @@ class Province extends Model
         return $this->hasMany(City::class, 'province_id');
     }
 }
+// izamadd
