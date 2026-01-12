@@ -9,7 +9,38 @@ use Illuminate\Support\Facades\Validator;
 class PublicFacilityController extends Controller
 {
     /**
-     * 1. CREATE: Tambah Fasilitas Baru
+     * 1. GET: Lihat Semua Fasilitas
+     */
+    public function index()
+    {
+        // Mengambil data fasilitas beserta nama kotanya
+        $data = PublicFacility::with('city.province')->get();
+
+        return response()->json([
+            'success' => true,
+            'data'    => $data
+        ]);
+    }
+
+    /**
+     * 2. GET: Lihat Detail Satu Fasilitas
+     */
+    public function show($id)
+    {
+        $data = PublicFacility::with('city.province')->find($id);
+
+        if (!$data) {
+            return response()->json(['message' => 'Data tidak ditemukan'], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data'    => $data
+        ]);
+    }
+
+    /**
+     * 3. POST: Tambah Fasilitas Baru
      */
     public function store(Request $request)
     {
@@ -34,7 +65,7 @@ class PublicFacilityController extends Controller
     }
 
     /**
-     * 2. UPDATE: Edit Data Fasilitas
+     * 4. PUT: Update Fasilitas
      */
     public function update(Request $request, $id)
     {
@@ -42,6 +73,17 @@ class PublicFacilityController extends Controller
 
         if (!$facility) {
             return response()->json(['message' => 'Data tidak ditemukan'], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'city_id' => 'sometimes|exists:cities,id',
+            'name'    => 'sometimes|string|max:255',
+            'type'    => 'sometimes|in:education,health,worship,security,transport,public_space',
+            'address' => 'nullable|string'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
         }
 
         $facility->update($request->all());
@@ -54,7 +96,7 @@ class PublicFacilityController extends Controller
     }
 
     /**
-     * 3. DELETE: Hapus Fasilitas
+     * 5. DELETE: Hapus Fasilitas
      */
     public function destroy($id)
     {

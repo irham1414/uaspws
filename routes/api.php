@@ -56,14 +56,12 @@ Route::middleware(['auth:api'])->group(function () {
     Route::apiResource('population-stats', PopulationStatController::class);
 
     // 5. IMPLEMENTASI PROGRAM (FULL CRUD)
-    // PERBAIKAN DI SINI:
-    // Sekarang menggunakan apiResource agar mendukung GET, POST, PUT, DELETE
     Route::apiResource('program-implementations', ProgramImplementationController::class);
 
-    // 6. FASILITAS PUBLIK
-    // Tetap manual karena controllernya mungkin belum ada fungsi index/show
-    Route::post('/public-facilities', [PublicFacilityController::class, 'store']); // Tambah
-    Route::put('/public-facilities/{id}', [PublicFacilityController::class, 'update']); // Edit
-    Route::delete('/public-facilities/{id}', [PublicFacilityController::class, 'destroy']); // Hapus
+    // 6. FASILITAS PUBLIK (FULL CRUD)
+    // PERBAIKAN DI SINI:
+    // Sekarang menggunakan apiResource agar mendukung GET, POST, PUT, DELETE
+    // (Pastikan Controller sudah Anda update dengan kode index & show yang saya berikan sebelumnya)
+    Route::apiResource('public-facilities', PublicFacilityController::class);
 
 });
