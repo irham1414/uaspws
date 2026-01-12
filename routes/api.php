@@ -44,6 +44,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
 
     // 2. DATA WILAYAH (Write Operations)
+    // Create, Update, Delete untuk wilayah hanya boleh user login
     Route::apiResource('provinces', ProvinceController::class)->except(['index', 'show']);
     Route::apiResource('cities', CityController::class)->except(['index', 'show']);
     Route::apiResource('districts', DistrictController::class)->except(['index', 'show']);
@@ -51,15 +52,16 @@ Route::middleware(['auth:api'])->group(function () {
     // 3. PROGRAMS (All CRUD)
     Route::apiResource('programs', ProgramController::class);
 
-    // 4. STATISTIK PENDUDUK
-    Route::post('/population-stats', [PopulationStatController::class, 'store']);
+    // 4. STATISTIK PENDUDUK (FULL CRUD)
+    Route::apiResource('population-stats', PopulationStatController::class);
 
-    // 5. IMPLEMENTASI PROGRAM
-    Route::post('/program-implementations', [ProgramImplementationController::class, 'store']);
-    Route::put('/program-implementations/{id}', [ProgramImplementationController::class, 'update']);
+    // 5. IMPLEMENTASI PROGRAM (FULL CRUD)
+    // PERBAIKAN DI SINI:
+    // Sekarang menggunakan apiResource agar mendukung GET, POST, PUT, DELETE
+    Route::apiResource('program-implementations', ProgramImplementationController::class);
 
-    // 6. FASILITAS PUBLIK (Baru Ditambahkan)
-    // Langsung ditaruh di sini, tidak perlu buat grup middleware baru lagi
+    // 6. FASILITAS PUBLIK
+    // Tetap manual karena controllernya mungkin belum ada fungsi index/show
     Route::post('/public-facilities', [PublicFacilityController::class, 'store']); // Tambah
     Route::put('/public-facilities/{id}', [PublicFacilityController::class, 'update']); // Edit
     Route::delete('/public-facilities/{id}', [PublicFacilityController::class, 'destroy']); // Hapus

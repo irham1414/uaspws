@@ -6,33 +6,42 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('public_facilities', function (Blueprint $table) {
             $table->id();
             
-            // Relasi: Fasilitas ini ada di Kota mana?
+            // RELASI: Menghubungkan fasilitas ke tabel cities (kota)
+            // constrained('cities') artinya id ini harus ada di tabel cities
+            // onDelete('cascade') artinya jika kota dihapus, fasilitas di dalamnya ikut terhapus
             $table->foreignId('city_id')
                   ->constrained('cities')
-                  ->onDelete('cascade'); // Jika kota dihapus, fasilitas ikut terhapus
+                  ->onDelete('cascade');
 
-            $table->string('name'); // Contoh: "RSUD Mataram"
-            
-            // Jenis Fasilitas (Enum agar datanya seragam)
+            $table->string('name'); // Nama fasilitas, misal: RSUD Mataram
+
+            // Pilihan tipe fasilitas yang tersedia
             $table->enum('type', [
-                'education', // Sekolah/Kampus
-                'health',    // Rumah Sakit/Puskesmas
-                'worship',   // Masjid/Gereja/Pura
-                'security',  // Kantor Polisi/Kodim
-                'transport', // Terminal/Stasiun
-                'public_space' // Taman/Alun-alun
+                'education',    // Sekolah/Kampus
+                'health',       // Rumah Sakit/Puskesmas
+                'worship',      // Tempat Ibadah
+                'security',     // Kantor Polisi/Militer
+                'transport',    // Terminal/Bandara/Pelabuhan
+                'public_space'  // Taman/Alun-alun
             ]);
 
-            $table->text('address')->nullable(); // Alamat lengkap
-            $table->timestamps();
+            $table->text('address')->nullable(); // Alamat boleh kosong
+
+            $table->timestamps(); // Created_at & Updated_at
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('public_facilities');
